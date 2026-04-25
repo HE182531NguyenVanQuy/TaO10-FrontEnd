@@ -1,0 +1,377 @@
+<div class="dashboard-container">
+  <!-- ============================================ -->
+  <!-- SIDEBAR -->
+  <!-- ============================================ -->
+  <aside class="sidebar" [class.open]="!isSidebarCollapsed">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+      </div>
+      <div class="brand-text">
+        <h1>TaO10</h1>
+        <p>Management Portal</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Menu chính -->
+      <a
+        *ngFor="let item of sidebarMenuItems"
+        class="nav-item"
+        [class.active]="item.active"
+        (click)="navigateTo(item.route)"
+      >
+        <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+
+      <!-- Separator -->
+      <div class="nav-separator"></div>
+
+      <!-- Settings -->
+      <a
+        class="nav-item"
+        [class.active]="activeMenuItem === 'settings'"
+        (click)="navigateTo('settings')"
+      >
+        <span class="material-symbols-outlined nav-icon">settings</span>
+        <span class="nav-label">Settings</span>
+      </a>
+
+      <!-- Logout -->
+      <a
+        class="nav-item logout-nav-item"
+        (click)="navigateTo('logout')"
+      >
+        <span class="material-symbols-outlined nav-icon">logout</span>
+        <span class="nav-label">Logout</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ============================================ -->
+  <!-- MAIN CONTENT -->
+  <!-- ============================================ -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="mobile-toggle" (click)="toggleSidebar()">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+        <div class="breadcrumb">
+          <span class="breadcrumb-link" (click)="navigateTo('dashboard')">Admin</span>
+          <span class="material-symbols-outlined breadcrumb-separator">chevron_right</span>
+          <span class="breadcrumb-current">Dashboard</span>
+        </div>
+        <div class="search-wrapper">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input
+            class="search-input"
+            placeholder="Tìm kiếm người dùng, đề thi, giao dịch..."
+            type="text"
+          />
+        </div>
+      </div>
+
+      <div class="top-bar-right">
+        <button class="icon-btn">
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="notification-dot"></span>
+        </button>
+        <button class="icon-btn" (click)="navigateTo('settings')">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
+        <div class="divider"></div>
+        <div class="user-profile">
+          <div class="user-info">
+            <p class="user-name">{{ adminName }}</p>
+            <p class="user-role">{{ adminRole }}</p>
+          </div>
+          <img
+            class="user-avatar"
+            [src]="adminAvatar"
+            alt="Admin avatar"
+          />
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <!-- Header -->
+      <div class="page-header fade-in-up">
+        <div class="header-info">
+          <h2>Dashboard</h2>
+          <p>Real-time performance metrics and institutional health metrics.</p>
+        </div>
+        <button class="btn-export" (click)="exportReport()">
+          <span class="material-symbols-outlined" style="font-size: 1.25rem;">download</span>
+          Export Report
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid fade-in-up">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-outlined stat-icon" style="font-variation-settings: 'FILL' 1;">group</span>
+            </div>
+            <span class="stat-change positive">+12.5%</span>
+          </div>
+          <div class="stat-body">
+            <h4>Total Customers</h4>
+            <p class="stat-value">{{ stats.totalCustomers | number }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-outlined stat-icon" style="font-variation-settings: 'FILL' 1;">payments</span>
+            </div>
+            <span class="stat-change positive">+8.2%</span>
+          </div>
+          <div class="stat-body">
+            <h4>Monthly Revenue</h4>
+            <p class="stat-value">${{ stats.monthlyRevenue | number }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-outlined stat-icon" style="font-variation-settings: 'FILL' 1;">quiz</span>
+            </div>
+            <span class="stat-change negative">-2.4%</span>
+          </div>
+          <div class="stat-body">
+            <h4>Active Exams</h4>
+            <p class="stat-value">{{ stats.activeExams }}</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon-wrapper">
+              <span class="material-symbols-outlined stat-icon" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+            </div>
+            <span class="stat-change positive">+18.1%</span>
+          </div>
+          <div class="stat-body">
+            <h4>Total Attempts</h4>
+            <p class="stat-value">{{ stats.totalAttempts / 1000 }}k</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row fade-in-up">
+        <!-- Revenue Chart với 12 cột -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Revenue Analytics</h3>
+            <div class="chart-tabs">
+              <button 
+                class="tab-btn" 
+                [class.active]="activeRevenueTab === 'weekly'"
+                (click)="setRevenueTab('weekly')"
+              >Weekly</button>
+              <button 
+                class="tab-btn" 
+                [class.active]="activeRevenueTab === 'monthly'"
+                (click)="setRevenueTab('monthly')"
+              >Monthly</button>
+              <button 
+                class="tab-btn" 
+                [class.active]="activeRevenueTab === 'yearly'"
+                (click)="setRevenueTab('yearly')"
+              >Yearly</button>
+            </div>
+          </div>
+          <div class="chart-body" [class.chart-12-cols]="activeRevenueTab === 'monthly'">
+            <div 
+              class="chart-bar" 
+              *ngFor="let data of revenueData; let i = index" 
+              [style.height.%]="data.height" 
+              [style.background-color]="getBarColor(i)"
+              [title]="'Doanh thu ' + data.month + ': ' + data.value + 'M'"
+            >
+              <span class="bar-value">{{ data.value }}M</span>
+            </div>
+          </div>
+          <div class="chart-labels" [class.labels-12]="activeRevenueTab === 'monthly'">
+            <span *ngFor="let month of revenueMonths">{{ month }}</span>
+          </div>
+        </div>
+
+        <!-- Course Engagement -->
+        <div class="engagement-card">
+          <h3>Course Engagement</h3>
+          <div class="engagement-list">
+            <div class="engagement-item" *ngFor="let course of courseEngagements">
+              <div class="engagement-header">
+                <span class="course-name">{{ course.course }}</span>
+                <span class="course-percentage">{{ course.percentage }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="course.percentage"></div>
+              </div>
+            </div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon">
+              <span class="material-symbols-outlined">tips_and_updates</span>
+            </div>
+            <div class="insight-text">
+              <p>Growth Opportunity</p>
+              <p>STEM courses are 40% more popular this term.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Row (Table + Package Circle) -->
+      <div class="content-row fade-in-up">
+        <!-- Recent Transactions Table -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Recent Transactions</h3>
+            <button class="view-all-btn" (click)="viewAllHistory()">View All History</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>User</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let txn of recentTransactions">
+                  <td style="font-family: 'Courier New', monospace; color: #64748b;">{{ txn.id }}</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="user-avatar" [ngClass]="txn.avatarBg">{{ txn.initials }}</div>
+                      <span class="user-name">{{ txn.user }}</span>
+                    </div>
+                  </td>
+                  <td style="color: var(--outline);">{{ txn.date }}</td>
+                  <td class="amount">{{ txn.amount }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStatusClass(txn.status)">
+                      {{ getStatusLabel(txn.status) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Package Distribution Circle -->
+        <div class="package-card">
+          <h3>📦 Phân bố gói dịch vụ</h3>
+          
+          <!-- SVG Circle Chart -->
+          <div class="package-circle-wrapper">
+            <svg viewBox="0 0 200 200" class="package-circle-svg">
+              <!-- Vòng tròn nền -->
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#f1f5f9" stroke-width="20" />
+              
+              <!-- Gói Cơ Bản: 45% -->
+              <circle
+                cx="100" cy="100" r="80"
+                fill="none"
+                stroke="#4db8ff"
+                stroke-width="20"
+                stroke-dasharray="226.19 502.65"
+                transform="rotate(-90 100 100)"
+                style="transition: all 1s ease;"
+              />
+              
+              <!-- Gói Nâng Cao: 35% -->
+              <circle
+                cx="100" cy="100" r="80"
+                fill="none"
+                stroke="#2a8fd4"
+                stroke-width="20"
+                stroke-dasharray="175.93 502.65"
+                stroke-dashoffset="-226.19"
+                transform="rotate(-90 100 100)"
+                style="transition: all 1s ease;"
+              />
+              
+              <!-- Gói Cao Cấp: 20% -->
+              <circle
+                cx="100" cy="100" r="80"
+                fill="none"
+                stroke="#1a6ba0"
+                stroke-width="20"
+                stroke-dasharray="100.53 502.65"
+                stroke-dashoffset="-402.12"
+                transform="rotate(-90 100 100)"
+                style="transition: all 1s ease;"
+              />
+              
+              <!-- Văn bản trung tâm -->
+              <text x="100" y="95" text-anchor="middle" class="package-circle-total">
+                {{ stats.totalPackages | number }}
+              </text>
+              <text x="100" y="115" text-anchor="middle" class="package-circle-label">
+                Gói đã mua
+              </text>
+            </svg>
+          </div>
+
+          <!-- Package Summary Cards -->
+          <div class="package-summary">
+            <div class="summary-item" *ngFor="let pkg of packageStats" [style.border-left-color]="pkg.color">
+              <div class="summary-header">
+                <span class="summary-name">{{ pkg.name }}</span>
+                <span class="summary-badge" [style.background-color]="pkg.color">{{ pkg.percentage }}%</span>
+              </div>
+              <div class="summary-stats">
+                <div class="summary-stat">
+                  <span class="material-symbols-outlined">group</span>
+                  <span>{{ formatShortNumber(pkg.users) }}</span>
+                </div>
+                <div class="summary-stat">
+                  <span class="material-symbols-outlined">payments</span>
+                  <span>{{ formatCurrency(pkg.revenue) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="dashboard-footer">
+        <p class="footer-copyright">© 2026 TaO10 Dashboard. All rights reserved.</p>
+        <div class="footer-right">
+          <div class="system-status">
+            <span class="status-dot"></span>
+            System Operational
+          </div>
+          <div class="footer-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">API</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <!-- FAB Button -->
+  <div class="fab">
+    <button class="fab-btn">
+      <span class="material-symbols-outlined">add</span>
+    </button>
+  </div>
+</div>

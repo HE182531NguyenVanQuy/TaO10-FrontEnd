@@ -1,0 +1,228 @@
+<!-- Register Page Layout -->
+<div class="register-page">
+  <!-- Left Panel -->
+  <div class="register-left">
+    <div class="left-inner">
+      <!-- Brand -->
+      <div class="brand">
+        <div class="brand-logo">
+          <span class="brand-logo-t">T</span>
+          <span class="brand-logo-ao">aO</span>
+          <span class="brand-logo-10">10</span>
+        </div>
+        <div class="brand-tagline">
+          Học tiếng Anh<br>
+          hiệu quả hơn
+        </div>
+      </div>
+
+      <!-- Hero Text -->
+      <div class="left-hero">
+        <h2>Tham gia cộng đồng<br>học viên TaO10</h2>
+        <p>Khám phá các tính năng AI tiên tiến và tài liệu học tập chất lượng cao.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="left-stats">
+        <div class="stat-item">
+          <div class="stat-num">50K+</div>
+          <div class="stat-lbl">Học viên</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-num">100+</div>
+          <div class="stat-lbl">Bài học</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-num">24/7</div>
+          <div class="stat-lbl">Hỗ trợ</div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="left-features">
+        <div class="feat-item">
+          <div class="feat-icon">🤖</div>
+          <div class="feat-text">Phân tích AI thông minh</div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon">📚</div>
+          <div class="feat-text">Thư viện bài học phong phú</div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon">🎯</div>
+          <div class="feat-text">Theo dõi tiến độ cá nhân</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="register-right">
+    <div class="form-card">
+      <!-- Form Header -->
+      <div class="form-header">
+        <div class="form-badge">
+          <div class="badge-dot"></div>
+          Đăng ký miễn phí
+        </div>
+        <h1>Tạo tài khoản</h1>
+        <p>Điền thông tin để bắt đầu hành trình học tiếng Anh của bạn.</p>
+        <p class="note">Sau khi đăng ký, hệ thống sẽ gửi mật khẩu tạm thời (6 chữ số) tới email bạn cung cấp — hãy kiểm tra hộp thư.</p>
+        <p>Đã có tài khoản? <a class="link-login" routerLink="/login">Đăng nhập</a></p>
+      </div>
+
+      <!-- Social Buttons -->
+      <div class="social-btns">
+        <button class="social-btn" type="button" (click)="registerWithGoogle()">
+          <!-- SVG omitted for brevity -->
+          Google
+        </button>
+        <button class="social-btn" type="button" (click)="registerWithFacebook()">
+          <!-- SVG omitted for brevity -->
+          Facebook
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">hoặc đăng ký với email</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Registration Form -->
+      <form class="register-form" (ngSubmit)="onSubmit()" #registerForm="ngForm" novalidate>
+        <!-- Name Field -->
+        <div class="field-group" [class.error]="nameError" [class.success]="!nameError && fullName">
+          <label class="field-label" for="name">Họ và tên</label>
+          <div class="field-wrap">
+            <div class="field-icon">👤</div>
+            <input
+              class="field-input"
+              id="name"
+              type="text"
+              placeholder="Nhập họ và tên đầy đủ"
+              [(ngModel)]="fullName"
+              (blur)="validateFullName()"
+              (input)="validateFullName()"
+              name="fullName"
+              required
+            >
+            <div class="field-status" *ngIf="nameError">⚠️</div>
+            <div class="field-status" *ngIf="!nameError && fullName">✅</div>
+          </div>
+          <div class="field-error" *ngIf="nameError">{{ nameError }}</div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="field-group" [class.error]="emailError" [class.success]="emailSuccess">
+          <label class="field-label" for="email">Email</label>
+          <div class="field-wrap">
+            <div class="field-icon">✉️</div>
+            <input
+              class="field-input"
+              id="email"
+              type="email"
+              placeholder="example@email.com"
+              [(ngModel)]="email"
+              (blur)="validateEmail()"
+              (input)="validateEmail()"
+              name="email"
+              required
+            >
+            <div class="field-status" *ngIf="emailError">⚠️</div>
+            <div class="field-status" *ngIf="emailSuccess">✅</div>
+          </div>
+          <div class="field-error" *ngIf="emailError">{{ emailError }}</div>
+        </div>
+
+        <!-- Phone Field -->
+        <div class="field-group" [class.error]="phoneError" [class.success]="!phoneError && phone">
+          <label class="field-label" for="phone">Số điện thoại</label>
+          <div class="field-wrap">
+            <div class="field-icon">📱</div>
+            <input
+              class="field-input"
+              id="phone"
+              type="tel"
+              placeholder="0912345678"
+              [(ngModel)]="phone"
+              (blur)="validatePhone()"
+              (input)="validatePhone()"
+              name="phone"
+              required
+            >
+            <div class="field-status" *ngIf="phoneError">⚠️</div>
+            <div class="field-status" *ngIf="!phoneError && phone">✅</div>
+          </div>
+          <div class="field-error" *ngIf="phoneError">{{ phoneError }}</div>
+        </div>
+
+        <!-- Location Field -->
+        <div class="field-group" [class.error]="locationError" [class.success]="!locationError && location">
+          <label class="field-label" for="location">Địa điểm</label>
+          <div class="field-wrap">
+            <div class="field-icon">📍</div>
+            <input
+              class="field-input"
+              id="location"
+              type="text"
+              placeholder="Ví dụ: Hà Nội"
+              [(ngModel)]="location"
+              (blur)="validateLocation()"
+              (input)="validateLocation()"
+              name="location"
+              required
+            />
+            <div class="field-status" *ngIf="locationError">⚠️</div>
+            <div class="field-status" *ngIf="!locationError && location">✅</div>
+          </div>
+          <div class="field-error" *ngIf="locationError">{{ locationError }}</div>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="field-group" [class.error]="termsError">
+          <label class="terms-wrap" for="agreeToTerms">
+            <input
+              class="terms-checkbox"
+              id="agreeToTerms"
+              type="checkbox"
+              [(ngModel)]="agreeToTerms"
+              (change)="validateTerms()"
+              name="agreeToTerms"
+              required
+            >
+            <span class="terms-label">
+              Tôi đồng ý với <a class="terms-link" href="#" target="_blank">Điều khoản sử dụng</a> và <a class="terms-link" href="#" target="_blank">Chính sách bảo mật</a>
+            </span>
+          </label>
+          <div class="field-error" *ngIf="termsError">{{ termsError }}</div>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          class="btn-submit"
+          type="submit"
+          [disabled]="isLoading"
+          [class.loading]="isLoading"
+        >
+          <div class="btn-spinner" *ngIf="isLoading"></div>
+          <span class="btn-text">{{ isLoading ? 'Đang tạo tài khoản...' : 'Tạo tài khoản' }}</span>
+        </button>
+      </form>
+
+      <!-- Form Error -->
+      <div class="form-error" *ngIf="registerError">
+        <div class="alert-icon">⚠️</div>
+        <div>{{ registerError }}</div>
+      </div>
+    </div>
+  </div>
+</div>

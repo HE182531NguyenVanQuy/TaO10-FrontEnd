@@ -189,6 +189,8 @@ nav {
   cursor: pointer;
   box-shadow: 0 3px 12px rgba(14, 165, 233, 0.35);
   transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 .btn-register:hover {
   transform: translateY(-1px);
