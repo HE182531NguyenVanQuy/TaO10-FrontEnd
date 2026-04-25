@@ -1,118 +1,3 @@
-// import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-// import { isPlatformBrowser } from '@angular/common';
-// import { HttpClient } from '@angular/common/http';
-// import { Observable, BehaviorSubject, of } from 'rxjs';
-// import { tap } from 'rxjs/operators';
-// import { environment } from '../../environments/environment';
-// import { RegisterRequest, LoginRequest, TokenResponse } from '../models/auth.models';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class AuthService {
-//   private apiUrl = `${environment.apiUrl}/auth`;
-//   private currentUser = new BehaviorSubject<any>(null);
-//   private readonly accessTokenKey = 'tao10_access_token';
-//   private readonly refreshTokenKey = 'tao10_refresh_token';
-//   private readonly userKey = 'tao10_user';
-//   private isBrowser: boolean;
-
-//   constructor(
-//     private http: HttpClient,
-//     @Inject(PLATFORM_ID) private platformId: Object
-//   ) {
-//     this.isBrowser = isPlatformBrowser(this.platformId);
-
-//     // only access localStorage in browser
-//     if (this.isBrowser) {
-//       const token = this.getAccessToken();
-//       const userJson = localStorage.getItem(this.userKey);
-//       if (token && userJson) {
-//         try {
-//           this.currentUser.next(JSON.parse(userJson));
-//         } catch {
-//           this.currentUser.next(null);
-//         }
-//       }
-//     }
-//   }
-
-//   register(payload: RegisterRequest): Observable<any> {
-//     return this.http.post(`${this.apiUrl}/register`, payload);
-//   }
-
-//   login(credentials: LoginRequest): Observable<TokenResponse> {
-//     return this.http.post<TokenResponse>(`${this.apiUrl}/login`, credentials).pipe(
-//       tap(res => {
-//         if (!res) return;
-//         const access = (res as any).accessToken ?? (res as any).AccessToken;
-//         const refresh = (res as any).refreshToken ?? (res as any).RefreshToken;
-//         if (access && refresh && this.isBrowser) {
-//           localStorage.setItem(this.accessTokenKey, access);
-//           localStorage.setItem(this.refreshTokenKey, refresh);
-//           const user = { email: credentials.email }; // or fetch profile
-//           localStorage.setItem(this.userKey, JSON.stringify(user));
-//           this.currentUser.next(user);
-//         }
-//       })
-//     );
-//   }
-
-//   logout(): Observable<any> {
-//     const refresh = this.getRefreshToken();
-//     if (this.isBrowser) {
-//       this.clearTokens();
-//       this.currentUser.next(null);
-//     }
-//     if (!refresh) return of(null);
-//     return this.http.post(`${this.apiUrl}/revoke`, { refreshToken: refresh });
-//   }
-
-//   refreshToken(): Observable<TokenResponse> {
-//     const refresh = this.getRefreshToken();
-//     if (!refresh) return of(null as any);
-//     return this.http.post<TokenResponse>(`${this.apiUrl}/refresh`, { refreshToken: refresh }).pipe(
-//       tap(res => {
-//         if (!res || !this.isBrowser) return;
-//         const access = (res as any).accessToken ?? (res as any).AccessToken;
-//         const refreshNew = (res as any).refreshToken ?? (res as any).RefreshToken;
-//         if (access && refreshNew) {
-//           localStorage.setItem(this.accessTokenKey, access);
-//           localStorage.setItem(this.refreshTokenKey, refreshNew);
-//         }
-//       })
-//     );
-//   }
-
-//   getAccessToken(): string | null {
-//     if (!this.isBrowser) return null;
-//     return localStorage.getItem(this.accessTokenKey);
-//   }
-
-//   getRefreshToken(): string | null {
-//     if (!this.isBrowser) return null;
-//     return localStorage.getItem(this.refreshTokenKey);
-//   }
-
-//   private clearTokens(): void {
-//     if (!this.isBrowser) return;
-//     localStorage.removeItem(this.accessTokenKey);
-//     localStorage.removeItem(this.refreshTokenKey);
-//     localStorage.removeItem(this.userKey);
-//   }
-
-//   getCurrentUser() {
-//     return this.currentUser.asObservable();
-//   }
-
-//   isLoggedIn(): boolean {
-//     return !!this.getAccessToken();
-//   }
-// }
-
-
-
-
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -125,7 +10,7 @@ import { RegisterRequest, LoginRequest, TokenResponse, CurrentUser } from '../mo
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl: string;
   private currentUser = new BehaviorSubject<CurrentUser | null>(null);
   private readonly accessTokenKey = 'tao10_access_token';
   private readonly refreshTokenKey = 'tao10_refresh_token';
@@ -137,6 +22,10 @@ export class AuthService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+
+    // Normalize environment.apiUrl and default to '/api' so endpoints match backend routes like '/api/Auth/...'
+    const base = (environment.apiUrl ?? '').trim().replace(/\/+$/, '');
+    this.apiUrl = base ? `${base}/Auth` : '/api/Auth';
 
     if (this.isBrowser) {
       const token = this.getAccessToken();
@@ -204,9 +93,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/revoke`, { refreshToken: refresh });
   }
 
-  refreshToken(): Observable<TokenResponse> {
+  // Return null when no refresh token exists
+  refreshToken(): Observable<TokenResponse | null> {
     const refresh = this.getRefreshToken();
-    if (!refresh) return of(null as any);
+    if (!refresh) return of(null);
     return this.http.post<TokenResponse>(`${this.apiUrl}/refresh`, { refreshToken: refresh }).pipe(
       tap(res => {
         if (!res || !this.isBrowser) return;
@@ -306,8 +196,6 @@ export class AuthService {
       }
     }
 
-    // Fallback: some tokens use 'http://schemas...' with shortened key
-    // also return undefined if not found
     return undefined;
   }
 }
